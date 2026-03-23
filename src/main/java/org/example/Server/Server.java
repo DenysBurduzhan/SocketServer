@@ -10,12 +10,13 @@ public class Server {
     private static final int PORT = 4045;
     private ArrayList<ClientHandler> clients = new ArrayList<>();
 
-    public Server(){
-        try{
+    public Server() throws IOException {
+
             ServerSocket serverSocket = new ServerSocket(PORT);
             System.out.println("start");
             Socket clientSocket = null;
 
+        try{
             while (true){
                 clientSocket = serverSocket.accept();
                 ClientHandler client = new ClientHandler(clientSocket,this);
@@ -23,6 +24,9 @@ public class Server {
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }finally {
+            clientSocket.close();
+            serverSocket.close();
         }
     }
     public void sendMessageToAll(String message){
@@ -30,6 +34,10 @@ public class Server {
             entry.sendMessage(message);
         }
 
+    }
+
+    public void removeClient(ClientHandler clientHandler){
+        clients.remove(clientHandler);
     }
 
     public static void main(String[] args) throws IOException {

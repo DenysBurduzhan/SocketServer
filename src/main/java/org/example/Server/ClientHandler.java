@@ -7,7 +7,7 @@ import java.util.Scanner;
 public class ClientHandler implements Runnable{
     private Server server;
     private Scanner inMessage;
-    private PrintWriter printWriter;
+    private PrintWriter outMessage;
     private static int client_count = 0;
     private Socket clientSocket = null;
 
@@ -16,7 +16,7 @@ public class ClientHandler implements Runnable{
             client_count++;
             this.server = server;
             this.clientSocket = socket;
-            this.printWriter = new PrintWriter(socket.getOutputStream());
+            this.outMessage = new PrintWriter(socket.getOutputStream());
             this.inMessage = new Scanner(socket.getInputStream());
 
         } catch (Exception e) {
@@ -24,17 +24,33 @@ public class ClientHandler implements Runnable{
         }
     }
 
+    public void closeConnection(){
+        server.removeClient(this);
+        client_count--;
+        server.sendMessageToAll(String.valueOf(client_count));
+    }
+
     public void sendMessage(String message){
-        printWriter.println(message);
-        printWriter.flush();
+        outMessage.println(message);
+        outMessage.flush();
     }
     @Override
     public void run() {
         try{
             while (true){
-
+                server.sendMessageToAll("NEW CLIENT");
+                server.sendMessageToAll(client_count + "");
                 break;
             }
+            while (true){
+                String clientMessage = inMessage.nextLine();
+                if(clientMessage.equals("END")){
+                    break;
+                }
+                System.out.println(clientMessage);
+                server.sendMessageToAll(clientMessage);
+            }
+            Thread.sleep(100);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
