@@ -23,6 +23,10 @@ public class ClientHandler implements Runnable{
         }
     }
 
+    public static int getCount(){
+        return client_count;
+    }
+
     public void closeConnection() throws IOException {
         ClientManager.removeClient(this);
         client_count--;
@@ -40,8 +44,6 @@ public class ClientHandler implements Runnable{
     @Override
     public void run() {
         try{
-            ClientManager.sendMessageToAll("NEW CLIENT CONNECTED");
-            ClientManager.sendMessageToAll(client_count + "");
                 String message;
             while ((message = in.readLine()) != null){
                 if(message.equalsIgnoreCase("END")){

@@ -23,7 +23,7 @@ public class Server {
                 while(true){
                     clientSocket = serverSocket.accept();
                     ClientHandler client = new ClientHandler(clientSocket, this);
-                    ClientManager.addClient(client);
+                    ClientManager.checkClientName(client);
                     service.submit(client);
                 }
         } catch (IOException e) {

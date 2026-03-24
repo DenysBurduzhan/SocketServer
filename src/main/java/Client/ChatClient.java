@@ -13,15 +13,15 @@ public class ChatClient {
 
     public static void main(String[] args) throws IOException {
         try{
+            clientSocket = new Socket("localhost", Server.getPORT());
+
+            reader = new BufferedReader(new InputStreamReader(System.in));
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            out = new PrintWriter(clientSocket.getOutputStream(), true);
+
             while (true) {
-                clientSocket = new Socket("localhost", Server.getPORT());
-                reader = new BufferedReader(new InputStreamReader(System.in));
-                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                out = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
                 String word = reader.readLine();
-                System.out.println(word);
-                out.write(word);
-                out.flush();
+                out.println(word);
                 String serverWord = in.readLine();
                 System.out.println(serverWord);
             }
