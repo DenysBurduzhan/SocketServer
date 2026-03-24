@@ -14,7 +14,6 @@ public class Server {
     private static ServerSocket serverSocket;
     private ExecutorService service = Executors.newFixedThreadPool(10);
     private static final int PORT = 4045;
-    private List<ClientHandler> clients = new CopyOnWriteArrayList<>();
 
     public Server() throws IOException {
 
@@ -26,21 +25,12 @@ public class Server {
                 while(true){
                     clientSocket = serverSocket.accept();
                     ClientHandler client = new ClientHandler(clientSocket, this);
-                    clients.add(client);
+                    ClientManager.addClient(client);
                     service.submit(client);
                 }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-    public void sendMessageToAll(String message) throws IOException {
-        for(ClientHandler entry : clients){
-            entry.sendMessage(message);
-        }
-    }
-
-    public void removeClient(ClientHandler clientHandler){
-        clients.remove(clientHandler);
     }
 
     public static void main(String[] args) throws IOException {

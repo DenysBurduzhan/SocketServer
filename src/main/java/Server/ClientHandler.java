@@ -24,9 +24,9 @@ public class ClientHandler implements Runnable{
     }
 
     public void closeConnection() throws IOException {
-        server.removeClient(this);
+        ClientManager.removeClient(this);
         client_count--;
-        server.sendMessageToAll(String.valueOf(client_count));
+        ClientManager.sendMessageToAll(String.valueOf(client_count));
     }
 
     public void sendMessage(String message) throws IOException {
@@ -40,15 +40,15 @@ public class ClientHandler implements Runnable{
     @Override
     public void run() {
         try{
-                server.sendMessageToAll("NEW CLIENT CONNECTED");
-                server.sendMessageToAll(client_count + "");
+            ClientManager.sendMessageToAll("NEW CLIENT CONNECTED");
+            ClientManager.sendMessageToAll(client_count + "");
                 String message;
             while ((message = in.readLine()) != null){
                 if(message.equalsIgnoreCase("END")){
                     break;
                 }
                 System.out.println(message);
-                server.sendMessageToAll(message);
+                ClientManager.sendMessageToAll(message);
             }
             Thread.sleep(100);
         } catch (Exception e) {
