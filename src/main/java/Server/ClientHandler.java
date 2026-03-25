@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ClientHandler implements Runnable{
+    private String name;
     private Server server;
     private BufferedReader in;
     private BufferedWriter out;
@@ -34,8 +35,34 @@ public class ClientHandler implements Runnable{
         out.flush();
     }
 
+    public String getName() {
+        return name;
+    }
+
     @Override
     public void run() {
+        while (true){
+            try {
+                out.write("Enter yor name:");
+                out.newLine();
+                out.flush();
+
+                String inputName = in.readLine();
+
+                if(!ClientManager.isNameTaken(inputName)){
+                    this.name = inputName;
+                    break;
+                }else{
+                    out.write("Name already taken, try again");
+                    out.newLine();
+                    out.flush();
+                    ClientManager.sendMessageToAll(name + " joined the chat");
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
         try{
                 String message;
             while ((message = in.readLine()) != null){
@@ -47,7 +74,7 @@ public class ClientHandler implements Runnable{
                     break;
                 }
                 System.out.println(message);
-                ClientManager.sendMessageToAll(message);
+                ClientManager.sendMessageToAll(name +": " + message);
             }
             Thread.sleep(100);
         } catch (Exception e) {

@@ -17,6 +17,15 @@ public class ClientManager {
         return clients;
     }
 
+    public static boolean isNameTaken(String name) {
+        for(ClientHandler client : clients){
+            if(client.getName() != null && client.getName().equals(name)){
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public static void sendMessageToAll(String message) throws IOException {
         for(ClientHandler entry : clients){
