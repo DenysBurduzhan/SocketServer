@@ -17,6 +17,25 @@ public class ClientManager {
         return clients;
     }
 
+    public static ClientHandler getByName(String name){
+        for(ClientHandler client : clients){
+            if(client.getName().equals(name)){
+                return client;
+            }
+        }
+        return null;
+    }
+    public static void sendPrivateMessage(String from, String to, String message) throws IOException {
+        ClientHandler target = getByName(to);
+        if(target != null){
+            target.sendMessage("[PM] " + ": " + message);
+        }
+        ClientHandler sender = getByName(from);
+        if (sender != null) {
+            sender.sendMessage("[PM to " + to + "]: " + message);
+        }
+    }
+
     public static boolean isNameTaken(String name) {
         for(ClientHandler client : clients){
             if(client.getName() != null && client.getName().equals(name)){

@@ -66,9 +66,21 @@ public class ClientHandler implements Runnable{
         try{
                 String message;
             while ((message = in.readLine()) != null){
-                if(message == null){
-                    System.out.println("client disconnected");
-                    break;
+                if (message.startsWith("/pm")) {
+
+                    String[] parts = message.split(" ", 3);
+
+                    if (parts.length < 3) {
+                        sendMessage("Usage: /pm <name> <message>");
+                        continue;
+                    }
+
+                    String targetName = parts[1];
+                    String privateMessage = parts[2];
+
+                    ClientManager.sendPrivateMessage(name, targetName, privateMessage);
+                    continue;
+
                 }
                 if(message.equalsIgnoreCase("END")){
                     break;
