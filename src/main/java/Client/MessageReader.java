@@ -1,13 +1,25 @@
 package Client;
 
 import java.io.BufferedReader;
-import java.io.PrintWriter;
-import java.net.Socket;
+import java.io.IOException;
 
-public class MessageReader {
-    private Socket socket;
+public class MessageReader implements Runnable{
     private BufferedReader in;
-    private PrintWriter out;
+
+    public MessageReader(BufferedReader in){
+        this.in = in;
+    }
 
 
+    @Override
+    public void run() {
+        try {
+            String msg;
+            while ((msg = in.readLine()) != null) {
+                System.out.println(msg);
+            }
+        } catch (IOException e) {
+            System.out.println("Disconnected from server");
+        }
+    }
 }
