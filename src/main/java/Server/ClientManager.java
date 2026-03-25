@@ -27,10 +27,14 @@ public class ClientManager {
     }
     public static void sendPrivateMessage(String from, String to, String message) throws IOException {
         ClientHandler target = getByName(to);
-        if(target != null){
-            target.sendMessage("[PM] " + from + ": " + message);
-        }
         ClientHandler sender = getByName(from);
+        if (target == null) {
+            if (sender != null) {
+                sender.sendMessage("User not found");
+            }
+            return;
+        }
+        target.sendMessage("[PM] " + from + ": " + message);
         if (sender != null) {
             sender.sendMessage("[PM to " + to + "]: " + message);
         }
