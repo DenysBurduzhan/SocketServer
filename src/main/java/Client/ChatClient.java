@@ -12,27 +12,29 @@ public class ChatClient {
     private static PrintWriter out;
 
     public static void main(String[] args) throws IOException {
-        try{
+        try {
             clientSocket = new Socket("localhost", Server.getPORT());
 
             reader = new BufferedReader(new InputStreamReader(System.in));
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             out = new PrintWriter(clientSocket.getOutputStream(), true);
 
-            while (true) {
-                String word = reader.readLine();
-                out.println(word);
-                String serverWord = in.readLine();
-                System.out.println(serverWord);
-            }
-
+            new Thread(() -> {
+                try {
+                    String msg;
+                    while ((msg = in.readLine()) != null) {
+                        System.out.println(msg);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
         } catch (IOException e) {
-            System.err.println(e);
-        } finally {
-            System.out.println("close");
-            clientSocket.close();
-            in.close();
-            out.close();
+            throw new RuntimeException(e);
+        }
+        while (true){
+            String message = reader.readLine();
+            out.println(message);
         }
     }
 }

@@ -2,17 +2,16 @@ package Server;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ClientHandler implements Runnable{
     private Server server;
     private BufferedReader in;
     private BufferedWriter out;
-    private static int client_count = 0;
     private Socket clientSocket = null;
 
     public ClientHandler(Socket socket, Server server){
         try{
-            client_count++;
             this.server = server;
             this.clientSocket = socket;
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -23,14 +22,10 @@ public class ClientHandler implements Runnable{
         }
     }
 
-    public static int getCount(){
-        return client_count;
-    }
 
     public void closeConnection() throws IOException {
         ClientManager.removeClient(this);
-        client_count--;
-        ClientManager.sendMessageToAll(String.valueOf(client_count));
+        ClientManager.sendMessageToAll(String.valueOf(ClientManager.getClients().size()));
     }
 
     public void sendMessage(String message) throws IOException {
@@ -38,14 +33,16 @@ public class ClientHandler implements Runnable{
         out.newLine();
         out.flush();
     }
-    public String readMessage() throws IOException {
-        return in.readLine();
-    }
+
     @Override
     public void run() {
         try{
                 String message;
             while ((message = in.readLine()) != null){
+                if(message == null){
+                    System.out.println("client disconnected");
+                    break;
+                }
                 if(message.equalsIgnoreCase("END")){
                     break;
                 }
@@ -58,6 +55,7 @@ public class ClientHandler implements Runnable{
         }finally {
             try {
                 closeConnection();
+                clientSocket.close();
             }catch (IOException e){
                 e.printStackTrace();
             }

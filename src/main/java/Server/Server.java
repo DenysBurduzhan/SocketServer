@@ -8,7 +8,6 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
-    private static Socket clientSocket;
     private static ServerSocket serverSocket;
     private ExecutorService service = Executors.newFixedThreadPool(10);
     private static final int PORT = 4045;
@@ -17,13 +16,14 @@ public class Server {
 
             serverSocket = new ServerSocket(PORT);
             System.out.println("start");
-            clientSocket = null;
+        Socket clientSocket = null;
 
         try{
                 while(true){
                     clientSocket = serverSocket.accept();
                     ClientHandler client = new ClientHandler(clientSocket, this);
-                    ClientManager.checkClientName(client);
+                    ClientManager.addClient(client);
+                    ClientManager.sendMessageToAll("New client connected" + " " + ClientManager.getClients().size());
                     service.submit(client);
                 }
         } catch (IOException e) {
