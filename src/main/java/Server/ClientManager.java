@@ -19,7 +19,7 @@ public class ClientManager {
 
     public static ClientHandler getByName(String name){
         for(ClientHandler client : clients){
-            if(client.getName().equals(name)){
+            if(client.getName() != null && client.getName().equals(name)){
                 return client;
             }
         }
@@ -28,7 +28,7 @@ public class ClientManager {
     public static void sendPrivateMessage(String from, String to, String message) throws IOException {
         ClientHandler target = getByName(to);
         if(target != null){
-            target.sendMessage("[PM] " + ": " + message);
+            target.sendMessage("[PM] " + from + ": " + message);
         }
         ClientHandler sender = getByName(from);
         if (sender != null) {

@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
-    private static ServerSocket serverSocket;
+    private ServerSocket serverSocket;
     private ExecutorService service = Executors.newFixedThreadPool(10);
     private static final int PORT = 4045;
 
@@ -21,7 +21,7 @@ public class Server {
         try{
                 while(true){
                     clientSocket = serverSocket.accept();
-                    ClientHandler client = new ClientHandler(clientSocket, this);
+                    ClientHandler client = new ClientHandler(clientSocket);
                     ClientManager.addClient(client);
                     ClientManager.sendMessageToAll("New client connected" + " " + ClientManager.getClients().size());
                     service.submit(client);

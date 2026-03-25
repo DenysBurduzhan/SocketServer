@@ -6,14 +6,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ClientHandler implements Runnable{
     private String name;
-    private Server server;
     private BufferedReader in;
     private BufferedWriter out;
     private Socket clientSocket = null;
 
-    public ClientHandler(Socket socket, Server server){
+    public ClientHandler(Socket socket){
         try{
-            this.server = server;
             this.clientSocket = socket;
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
@@ -26,7 +24,7 @@ public class ClientHandler implements Runnable{
 
     public void closeConnection() throws IOException {
         ClientManager.removeClient(this);
-        ClientManager.sendMessageToAll(String.valueOf(ClientManager.getClients().size()));
+        ClientManager.sendMessageToAll(name + " left the chat." + " Members: " + ClientManager.getClients().size());
     }
 
     public void sendMessage(String message) throws IOException {
@@ -48,15 +46,19 @@ public class ClientHandler implements Runnable{
                 out.flush();
 
                 String inputName = in.readLine();
+                if (inputName == null) {
+                    closeConnection();
+                    return;
+                }
 
                 if(!ClientManager.isNameTaken(inputName)){
                     this.name = inputName;
+                    ClientManager.sendMessageToAll(name + " joined the chat");
                     break;
                 }else{
                     out.write("Name already taken, try again");
                     out.newLine();
                     out.flush();
-                    ClientManager.sendMessageToAll(name + " joined the chat");
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -93,6 +95,7 @@ public class ClientHandler implements Runnable{
             e.printStackTrace();
         }finally {
             try {
+                System.out.println(name + " disconnected");
                 closeConnection();
                 clientSocket.close();
             }catch (IOException e){
