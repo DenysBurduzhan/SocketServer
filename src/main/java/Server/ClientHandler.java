@@ -2,19 +2,18 @@ package Server;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class ClientHandler implements Runnable{
     private String name;
     private BufferedReader in;
     private BufferedWriter out;
-    private Socket clientSocket = null;
+    private Socket clientSocket ;
 
     public ClientHandler(Socket socket){
         try{
             this.clientSocket = socket;
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -25,6 +24,7 @@ public class ClientHandler implements Runnable{
     public void closeConnection() throws IOException {
         ClientManager.removeClient(this);
         ClientManager.sendMessageToAll(name + " left the chat." + " Members: " + ClientManager.getClients().size());
+        clientSocket.close();
     }
 
     public void sendMessage(String message) throws IOException {
@@ -90,14 +90,12 @@ public class ClientHandler implements Runnable{
                 System.out.println(message);
                 ClientManager.sendMessageToAll(name +": " + message);
             }
-            Thread.sleep(100);
         } catch (Exception e) {
             e.printStackTrace();
         }finally {
             try {
                 System.out.println(name + " disconnected");
                 closeConnection();
-                clientSocket.close();
             }catch (IOException e){
                 e.printStackTrace();
             }

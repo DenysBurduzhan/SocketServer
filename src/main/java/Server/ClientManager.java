@@ -41,12 +41,7 @@ public class ClientManager {
     }
 
     public static boolean isNameTaken(String name) {
-        for(ClientHandler client : clients){
-            if(client.getName() != null && client.getName().equals(name)){
-                return true;
-            }
-        }
-        return false;
+        return getByName(name) != null;
     }
 
 
